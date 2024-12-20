@@ -5,7 +5,7 @@
   "scripts": {
     "start": "node src/server/server.js",
     "clean": "rm -rf dist && mkdir dist",
-    "lint": "semistandard src",
+    "lint": "semistandard 'src/**/*.js'",
     "debug": "npm run lint && npm run clean && lessc src/public/style.less dist/style.css && esbuild src/public/script.js --outfile=dist/bundle.js --bundle --sourcemap",
     "build": "npm run clean && lessc src/public/style.less src/public/style.css --clean-css && esbuild src/public/script.js --outfile=src/public/bundle.js --bundle --minify"
   },
