@@ -1,6 +1,6 @@
 // Importiere das Express-Paket und die Routen
 const express = require('express');
-const placesRouter = require('../routes/places'); // Importiere die Routen-Datei für "places"
+const placesRouter = require('../route/places'); // Importiere die Routen-Datei für "places"
 
 // Erstelle eine Express-Anwendung
 const app = express();
