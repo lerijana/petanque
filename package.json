@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node src/server/server.js"
+    "start": "node src/server/server.js",
+    "clean": "rm -rf dist && mkdir dist",
+    "lint": "semistandard src",
+    "debug": "npm run lint && npm run clean && lessc src/public/style.less dist/style.css && esbuild src/public/script.js --outfile=dist/bundle.js --bundle --sourcemap",
+    "build": "npm run clean && lessc src/public/style.less src/public/style.css --clean-css && esbuild src/public/script.js --outfile=src/public/bundle.js --bundle --minify"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +17,11 @@
     "express": "^4.21.1",
     "leaflet": "^1.9.4",
     "mongoose": "^8.8.1"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2",
+    "less": "^4.2.1",
+    "less-plugin-clean-css": "^1.6.0",
+    "semistandard": "^17.0.0"
   }
 }

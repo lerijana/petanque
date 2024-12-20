@@ -19,8 +19,7 @@ app.use(express.static('src/public'));
 app.use('/api/places', placesRouter);
 
 // Starte den Server
-console.log("Starte den Server...");
+console.log('Starte den Server...');
 app.listen(PORT, () => {
   console.log(`Server läuft auf http://localhost:${PORT}`);
 });
-
