@@ -11,23 +11,22 @@
     "build": "npm run lint && npm run build:css:min && npm run build:js:min && echo 'Build erfolgreich.'",
     "build:css": "lessc src/public/style.less src/public/style.css",
     "build:css:min": "lessc src/public/style.less src/public/style.css --clean-css",
-    "build:js": "esbuild src/public/script.js --bundle --outfile=src/public/bundle.js",
-    "build:js:min": "esbuild src/public/script.js --bundle --minify --outfile=src/public/bundle.js",
+    "build:js": "cat node_modules/leaflet/dist/leaflet.js src/public/script.js > src/public/bundle.js",
+    "build:js:min": "cat node_modules/leaflet/dist/leaflet.js src/public/script.js | terser -c -m -o src/public/bundle.js",
     "start": "node src/server/server.js 8080",
     "debug:watch": "nodemon src/server/server.js 8080"
   },
   "devDependencies": {
-    "esbuild": "^0.17.19",
     "less": "^4.1.3",
     "less-plugin-clean-css": "^1.5.1",
     "nodemon": "^3.1.9",
-    "semistandard": "^16.0.1"
+    "semistandard": "^16.0.1",
+    "terser": "^5.27.0"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "leaflet": "^1.9.4",
-    "mongoose": "^8.9.2",
-    "simple-update-notifier": "^2.0.0"
+    "mongoose": "^8.9.2"
   }
 }
