@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pétanque Spielverwaltung</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-gradient"></div>
+    <div class="app-container">
+        <header class="main-header">
+            <div class="title-container">
+                <h1 class="gradient-text">Petanque-Radar</h1>
+                <p class="subtitle">Finde und erstelle Pétanque-Spiele! Mit Petanque-Radar kannst du sehen, wo gespielt wird, eigene Spielorte und Matches erstellen sowie vergangene Spiele einsehen.</p>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <section class="places-section">
+                <div class="section-header">
+                    <h2>Plätze</h2>
+                    <button id="showAddPlaceForm" class="icon-button">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div id="map" class="map-container"></div>
+
+                <div id="addPlaceForm" class="form-panel hidden">
+                    <h3>Neuen Platz hinzufügen</h3>
+                    <div class="form-group">
+                        <label for="name">Name des Platzes:</label>
+                        <input type="text" id="name" required />
+                        <small>Geben Sie einen eindeutigen Namen für den Platz ein</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="latitude">Breitengrad (Latitude):</label>
+                        <input type="number" id="latitude" step="0.000001" required />
+                        <small>Gültiger Bereich für Deutschland: 47.0 bis 55.0</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="longitude">Längengrad (Longitude):</label>
+                        <input type="number" id="longitude" step="0.000001" required />
+                        <small>Gültiger Bereich für Deutschland: 5.0 bis 15.0</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="access">Zugang:</label>
+                        <select id="access">
+                            <option value="Öffentlich">Öffentlich</option>
+                            <option value="Privat">Privat</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="type">Art des Platzes:</label>
+                        <select id="type">
+                            <option value="Outdoor">Outdoor</option>
+                            <option value="Indoor">Indoor</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="field_count">Anzahl der Spielfelder:</label>
+                        <input type="number" id="field_count" min="1" max="20" value="1" />
+                        <small>Geben Sie die Anzahl der verfügbaren Spielfelder an (1-20)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notizen:</label>
+                        <textarea id="notes" rows="3"></textarea>
+                        <small>Zusätzliche Informationen zum Platz (optional)</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="addPlaceButton" class="primary-button">
+                            <i class="fas fa-plus"></i> Platz hinzufügen
+                        </button>
+                    </div>
+                </div>
+
+                <div id="editPlaceForm" class="form-panel hidden">
+                    <h3>Platz bearbeiten</h3>
+                    <div class="form-group">
+                        <label for="edit-name">Name des Platzes:</label>
+                        <input type="text" id="edit-name" required />
+                        <small>Geben Sie einen eindeutigen Namen für den Platz ein</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-latitude">Breitengrad (Latitude):</label>
+                        <input type="number" id="edit-latitude" step="0.000001" required />
+                        <small>Gültiger Bereich für Deutschland: 47.0 bis 55.0</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-longitude">Längengrad (Longitude):</label>
+                        <input type="number" id="edit-longitude" step="0.000001" required />
+                        <small>Gültiger Bereich für Deutschland: 5.0 bis 15.0</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-access">Zugang:</label>
+                        <select id="edit-access">
+                            <option value="Öffentlich">Öffentlich</option>
+                            <option value="Privat">Privat</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-type">Art des Platzes:</label>
+                        <select id="edit-type">
+                            <option value="Outdoor">Outdoor</option>
+                            <option value="Indoor">Indoor</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-field_count">Anzahl der Spielfelder:</label>
+                        <input type="number" id="edit-field_count" min="1" max="20" value="1" />
+                        <small>Geben Sie die Anzahl der verfügbaren Spielfelder an (1-20)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-notes">Notizen:</label>
+                        <textarea id="edit-notes" rows="3"></textarea>
+                        <small>Zusätzliche Informationen zum Platz (optional)</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button id="updatePlaceButton" class="primary-button">
+                            <i class="fas fa-save"></i> Änderungen speichern
+                        </button>
+                        <button id="cancelEditButton" class="secondary-button">
+                            <i class="fas fa-times"></i> Abbrechen
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="games-section">
+                <div class="section-header">
+                    <h2>Neues Spiel</h2>
+                    <button id="showNewGameForm" class="icon-button">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+
+                <div id="gameForm" class="form-panel hidden">
+                    <h3>Neue Partie starten</h3>
+                    <div class="form-group">
+                        <label for="team1">Team 1:</label>
+                        <input type="text" id="team1" required />
+                        <small>Name des ersten Teams</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="team2">Team 2:</label>
+                        <input type="text" id="team2" required />
+                        <small>Name des zweiten Teams</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="platz">Spielplatz:</label>
+                        <select id="platz" required>
+                            <option value="">Bitte wählen Sie einen Platz</option>
+                        </select>
+                        <small>Wählen Sie den Platz aus, auf dem gespielt wird</small>
+                    </div>
+
+                    <div class="form-actions">
+                        <button onclick="startGame()" class="primary-button">
+                            <i class="fas fa-play"></i> Spiel starten
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="active-games-section">
+                <div class="section-header">
+                    <h2>Aktive Spiele</h2>
+                </div>
+                <div id="activeGames" class="games-container">
+                    <!-- Aktive Spiele werden hier dynamisch eingefügt -->
+                </div>
+            </section>
+
+            <section class="finished-games-section">
+                <div class="section-header">
+                    <h2>Beendete Spiele</h2>
+                </div>
+                <div id="finishedGames" class="games-container">
+                    <!-- Beendete Spiele werden hier dynamisch eingefügt -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

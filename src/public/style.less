@@ -1,0 +1,764 @@
+// Variables
+@primary-color: #111827;      // Глубокий черный для основных элементов
+@accent-color: #374151;       // Темно-серый для акцентов
+@text-color: #111827;         // Почти черный для текста
+@light-gray: #ffffff;
+@secondary-color: #ffffff;
+@gray-100: #f9fafb;
+@gray-200: #f3f4f6;
+@gray-300: #e5e7eb;
+@gray-400: #d1d5db;
+@gray-500: #9ca3af;
+@gray-600: #6b7280;
+@gray-700: #4b5563;
+@gray-800: #1f2937;
+@gray-900: #111827;
+@marker-color: #7877C6;       // Фиолетовый цвет для маркеров
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap');
+
+@font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+@font-headings: 'Montserrat', @font-primary;
+
+// Shadows
+@shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+@shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+@shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+// Background gradient
+.background-gradient {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -2;
+    background: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(120, 119, 198, 0.3), rgba(255, 255, 255, 0));
+}
+
+// Global styles
+body {
+    font-family: @font-primary;
+    color: @text-color;
+    line-height: 1.6;
+    background-color: @gray-100;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+// Header styles
+.main-header {
+    text-align: center;
+    padding: 4rem 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.gradient-text {
+    font-family: @font-headings;
+    font-size: 3.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #7877C6 0%, @gray-700 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 1rem 0;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 1.125rem;
+    color: @gray-700;
+    max-width: 600px;
+    line-height: 1.6;
+}
+
+// Game styles
+.game-item {
+    background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 24px;
+    box-shadow: @shadow-md;
+    transition: all 0.3s ease;
+    border: 1px solid @gray-200;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, #4f46e5 0%, #818cf8 100%);
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: @shadow-lg;
+    }
+
+    &.active {
+        border: 1px solid #818cf8;
+        
+        .game-header {
+            .teams {
+                color: #4f46e5;
+            }
+            
+            .score {
+                background: linear-gradient(90deg, #4f46e5 0%, #818cf8 100%);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: 600;
+                font-size: 1.2em;
+                min-width: 80px;
+                text-align: center;
+            }
+        }
+    }
+
+    &.finished {
+        background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
+        border: none;
+        
+        &::before {
+            background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+        }
+        
+        .game-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border: none;
+            margin-bottom: 20px;
+            
+            .game-title {
+                .teams {
+                    color: @gray-700;
+                    margin-bottom: 8px;
+                }
+                
+                .final-score {
+                    font-family: @font-headings;
+                    font-size: 2em;
+                    font-weight: 700;
+                    color: #10b981;
+                    letter-spacing: -0.02em;
+                }
+            }
+            
+            .winner-badge {
+                background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+                color: white;
+                padding: 8px 16px;
+                border-radius: 20px;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                
+                i {
+                    color: #fbbf24;
+                }
+            }
+        }
+
+        .game-info {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            
+            .end-time {
+                color: @gray-600;
+                font-size: 0.95em;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 15px;
+                padding-bottom: 15px;
+                border-bottom: 1px solid @gray-200;
+
+                i {
+                    color: #10b981;
+                }
+            }
+            
+            .rounds-history {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                gap: 10px;
+                
+                .round {
+                    background: white;
+                    border-radius: 8px;
+                    padding: 10px;
+                    text-align: center;
+                    
+                    .round-number {
+                        color: @gray-600;
+                        font-size: 0.9em;
+                        margin-bottom: 5px;
+                    }
+                    
+                    .round-score {
+                        font-weight: 600;
+                        color: #10b981;
+                    }
+                }
+            }
+        }
+
+        .control-button.delete {
+            width: auto;
+            margin-left: auto;
+            padding: 8px 16px;
+        }
+    }
+
+    .game-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid @gray-200;
+
+        .teams {
+            font-family: @font-headings;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: @primary-color;
+            letter-spacing: -0.01em;
+        }
+    }
+
+    .game-location {
+        color: @gray-600;
+        font-size: 0.95em;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        i {
+            color: #818cf8;
+        }
+    }
+
+    .score-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        margin: 20px 0;
+        
+        .team-score {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 15px;
+            
+            .team-name {
+                font-weight: 600;
+                color: #4f46e5;
+                margin-bottom: 10px;
+            }
+            
+            .score-buttons {
+                display: flex;
+                gap: 8px;
+                flex-wrap: wrap;
+                
+                .score-btn {
+                    padding: 8px 12px;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    font-size: 0.9em;
+                    border: none;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    
+                    &.plus {
+                        background: #e0e7ff;
+                        color: #4f46e5;
+                        
+                        &:hover {
+                            background: #c7d2fe;
+                        }
+                    }
+                    
+                    &.minus {
+                        background: #fee2e2;
+                        color: #ef4444;
+                        
+                        &:hover {
+                            background: #fecaca;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .game-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+        padding-top: 20px;
+        border-top: 1px solid @gray-200;
+
+        .control-button {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+
+            &.finish {
+                background: #10b981;
+                color: white;
+
+                &:hover {
+                    background: #059669;
+                }
+            }
+
+            &.delete {
+                background: #ef4444;
+                color: white;
+
+                &:hover {
+                    background: #dc2626;
+                }
+            }
+
+            i {
+                font-size: 1.1em;
+            }
+        }
+    }
+}
+
+.games-section {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: @shadow-md;
+    margin-bottom: 40px;
+
+    h2 {
+        font-family: @font-headings;
+        font-size: 1.5em;
+        font-weight: 600;
+        color: @primary-color;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+
+        i {
+            color: #818cf8;
+        }
+    }
+}
+
+// Section styles
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    
+    h2 {
+        font-family: @font-headings;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: @gray-800;
+    }
+}
+
+// Form styles
+.form-panel {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: @shadow-md;
+    margin-top: 20px;
+
+    &.hidden {
+        display: none;
+    }
+
+    h3 {
+        margin: 0 0 20px 0;
+        color: @primary-color;
+        font-size: 1.5em;
+        font-family: @font-headings;
+    }
+
+    &.edit-mode {
+        border: 2px solid @primary-color;
+        position: relative;
+
+        &:before {
+            content: 'Bearbeitungsmodus';
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: @primary-color;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: @gray-700;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid @gray-300;
+            border-radius: 6px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            
+            &:focus {
+                outline: none;
+                border-color: @primary-color;
+                box-shadow: 0 0 0 2px fade(@primary-color, 10%);
+            }
+        }
+        
+        small {
+            display: block;
+            margin-top: 0.5rem;
+            color: @gray-600;
+            font-size: 0.875rem;
+        }
+    }
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+
+    button {
+        flex: 1;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &.primary-button {
+            background: @primary-color;
+            color: white;
+
+            &:hover {
+                background: lighten(@primary-color, 10%);
+            }
+        }
+
+        &.secondary-button {
+            background: @gray-200;
+            color: @gray-900;
+
+            &:hover {
+                background: darken(@gray-200, 10%);
+            }
+        }
+
+        i {
+            margin-right: 5px;
+        }
+    }
+}
+
+// Map styles
+.map-container {
+    width: 100%;
+    height: 400px;
+    margin-bottom: 2rem;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: @shadow-md;
+}
+
+// Map marker styles
+.custom-marker {
+    .marker-pin {
+        width: 30px;
+        height: 42px;
+        border-radius: 50% 50% 50% 0;
+        background: @marker-color;
+        position: absolute;
+        transform: rotate(-45deg);
+        left: 50%;
+        top: 50%;
+        margin: -20px 0 0 -20px;
+        
+        &:after {
+            content: '';
+            width: 24px;
+            height: 24px;
+            margin: 3px 0 0 3px;
+            background: white;
+            position: absolute;
+            border-radius: 50%;
+        }
+    }
+}
+
+// Popup styles
+.place-popup {
+    padding: 10px;
+    max-width: 300px;
+
+    h3 {
+        margin: 0 0 10px 0;
+        font-size: 1.2em;
+        color: @primary-color;
+        font-family: @font-headings;
+    }
+
+    p {
+        margin: 5px 0;
+        font-size: 0.9em;
+
+        strong {
+            color: @gray-900;
+        }
+    }
+
+    .popup-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 15px;
+
+        button {
+            flex: 1;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s ease;
+
+            i {
+                margin-right: 5px;
+            }
+
+            &.edit-button {
+                background-color: @primary-color;
+                color: white;
+
+                &:hover {
+                    background-color: lighten(@primary-color, 10%);
+                }
+            }
+
+            &.delete-button {
+                background-color: #dc3545;
+                color: white;
+
+                &:hover {
+                    background-color: darken(#dc3545, 10%);
+                }
+            }
+        }
+    }
+}
+
+// Button styles
+.primary-button {
+    background: @primary-color;
+    color: @secondary-color;
+    border: none;
+    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        background: lighten(@primary-color, 10%);
+    }
+    
+    i {
+        font-size: 0.9em;
+    }
+}
+
+.icon-button {
+    background: @secondary-color;
+    color: @primary-color;
+    border: 1px solid @gray-300;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    
+    &:hover {
+        background: @gray-100;
+        border-color: @primary-color;
+    }
+    
+    i {
+        font-size: 1rem;
+    }
+}
+
+// Pagination styles
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid @gray-200;
+
+    .page-button {
+        min-width: 40px;
+        height: 40px;
+        border-radius: 20px;
+        border: 1px solid @gray-200;
+        background: white;
+        color: @gray-700;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+
+        &:hover:not(.disabled) {
+            border-color: #818cf8;
+            color: #4f46e5;
+            background: #f8fafc;
+        }
+
+        &.active {
+            background: #4f46e5;
+            border-color: #4f46e5;
+            color: white;
+        }
+
+        &.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        i {
+            font-size: 0.9em;
+        }
+    }
+
+    .page-ellipsis {
+        color: @gray-600;
+        padding: 0 4px;
+    }
+}
+
+.games-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+// Responsive styles
+@media (max-width: 1200px) {
+    .games-container {
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .games-container {
+        grid-template-columns: 1fr;
+    }
+
+    .pagination {
+        .page-button {
+            min-width: 36px;
+            height: 36px;
+        }
+    }
+}
+
+// Empty state and error state styles
+.empty-state,
+.error-state {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: @shadow-md;
+    margin: 20px 0;
+
+    i {
+        font-size: 3em;
+        margin-bottom: 15px;
+        display: block;
+    }
+
+    p {
+        font-size: 1.1em;
+        color: @gray-600;
+        margin: 0;
+    }
+}
+
+.empty-state {
+    i {
+        color: #818cf8;
+    }
+}
+
+.error-state {
+    i {
+        color: #ef4444;
+    }
+}
