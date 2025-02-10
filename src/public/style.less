@@ -1,9 +1,8 @@
 @import (less) "../../node_modules/leaflet/dist/leaflet.css";
 
-// Variables
-@primary-color: #111827;      // Глубокий черный для основных элементов
-@accent-color: #374151;       // Темно-серый для акцентов
-@text-color: #111827;         // Почти черный для текста
+@primary-color: #111827;
+@accent-color: #374151;
+@text-color: #111827;
 @light-gray: #ffffff;
 @secondary-color: #ffffff;
 @gray-100: #f9fafb;
@@ -15,19 +14,19 @@
 @gray-700: #4b5563;
 @gray-800: #1f2937;
 @gray-900: #111827;
-@marker-color: #7877C6;       // Фиолетовый цвет для маркеров
+@marker-color: #7877C6;
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;600;700&display=swap');
 
 @font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 @font-headings: 'Montserrat', @font-primary;
 
-// Shadows
+// Schatten
 @shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 @shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 @shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 
-// Background gradient
+// Hintergrundsgradient
 .background-gradient {
     position: fixed;
     top: 0;
@@ -38,7 +37,6 @@
     background: radial-gradient(ellipse 80% 80% at 50% -20%, rgba(120, 119, 198, 0.3), rgba(255, 255, 255, 0));
 }
 
-// Global styles
 body {
     font-family: @font-primary;
     color: @text-color;
@@ -54,7 +52,6 @@ body {
     padding: 20px;
 }
 
-// Header styles
 .main-header {
     text-align: center;
     padding: 4rem 1rem;
@@ -88,7 +85,7 @@ body {
     line-height: 1.6;
 }
 
-// Game styles
+// Spiele
 .game-item {
     background: linear-gradient(145deg, #ffffff 0%, #f8f9fa 100%);
     border-radius: 16px;
@@ -402,7 +399,7 @@ body {
     }
 }
 
-// Form styles
+// Form
 .form-panel {
     background: white;
     padding: 20px;
@@ -509,7 +506,7 @@ body {
     }
 }
 
-// Map styles
+// Karte
 .map-container {
     width: 100%;
     height: 400px;
@@ -519,7 +516,7 @@ body {
     box-shadow: @shadow-md;
 }
 
-// Map marker styles
+// Marker
 .custom-marker {
     .marker-pin {
         width: 30px;
@@ -544,7 +541,7 @@ body {
     }
 }
 
-// Popup styles
+// Popup 
 .place-popup {
     padding: 10px;
     max-width: 300px;
@@ -604,7 +601,7 @@ body {
     }
 }
 
-// Button styles
+// Tasten
 .primary-button {
     background: @primary-color;
     color: @secondary-color;
@@ -651,7 +648,7 @@ body {
     }
 }
 
-// Pagination styles
+// Pagination 
 .pagination {
     display: flex;
     justify-content: center;
@@ -710,7 +707,6 @@ body {
     margin-bottom: 30px;
 }
 
-// Responsive styles
 @media (max-width: 1200px) {
     .games-container {
         grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -730,7 +726,7 @@ body {
     }
 }
 
-// Empty state and error state styles
+// Error
 .empty-state,
 .error-state {
     text-align: center;

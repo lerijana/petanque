@@ -1,7 +1,7 @@
 {
   "name": "petanque",
   "version": "1.0.0",
-  "description": "Petanque Webanwendung",
+  "description": "Petanque Radar",
   "main": "src/server/server.js",
   "scripts": {
     "clean": "rm -rf src/public/bundle.js src/public/style.css node_modules",

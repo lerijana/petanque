@@ -1,11 +1,10 @@
 /* global L, alert, confirm */
 
-// Globale Variablen
 let map;
 let marker;
 const defaultPosition = [51.1657, 10.4515]; // Zentrum von Deutschland
 
-// Custom marker icon
+// Custom Marker
 const violetIcon = L.divIcon({
   className: 'custom-marker',
   html: '<div class="marker-pin"></div>',
@@ -13,7 +12,6 @@ const violetIcon = L.divIcon({
   iconAnchor: [15, 42]
 });
 
-// Warte, bis das DOM geladen ist
 document.addEventListener('DOMContentLoaded', function () {
   initMap();
   loadPlaces();
@@ -38,7 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // Event Listener für den "Platz hinzufügen" Button
   const addPlaceButton = document.getElementById('addPlaceButton');
   if (addPlaceButton) {
     addPlaceButton.addEventListener('click', addPlace);
@@ -76,7 +73,6 @@ function initMap () {
   });
 }
 
-// Plätze laden
 async function loadPlaces () {
   try {
     const response = await fetch('/api/places');
@@ -120,7 +116,6 @@ async function loadPlaces () {
                     </div>
                 `;
 
-        // Event Listener für die Buttons im Popup
         const editButton = popupContent.querySelector('.edit-button');
         const deleteButton = popupContent.querySelector('.delete-button');
 
@@ -220,7 +215,6 @@ async function editPlace (placeId) {
     document.getElementById('edit-field_count').value = place.fieldCount;
     document.getElementById('edit-notes').value = place.notes || '';
 
-    // Formular anzeigen
     const editPlaceForm = document.getElementById('editPlaceForm');
     editPlaceForm.classList.remove('hidden');
     editPlaceForm.classList.add('edit-mode');
@@ -228,7 +222,6 @@ async function editPlace (placeId) {
     // Scroll zum Formular
     editPlaceForm.scrollIntoView({ behavior: 'smooth' });
 
-    // Event Listener für die Buttons
     const updateButton = document.getElementById('updatePlaceButton');
     const cancelButton = document.getElementById('cancelEditButton');
 
@@ -279,7 +272,6 @@ function cancelEdit () {
   document.getElementById('edit-field_count').value = '1';
   document.getElementById('edit-notes').value = '';
 
-  // Marker entfernen
   if (marker) {
     map.removeLayer(marker);
     marker = null;
@@ -322,7 +314,6 @@ async function updatePlace (placeId) {
       throw new Error('Fehler beim Aktualisieren des Platzes');
     }
 
-    // Formular ausblenden
     const editPlaceForm = document.getElementById('editPlaceForm');
     editPlaceForm.classList.add('hidden');
     editPlaceForm.classList.remove('edit-mode');
@@ -336,13 +327,11 @@ async function updatePlace (placeId) {
     document.getElementById('edit-field_count').value = '1';
     document.getElementById('edit-notes').value = '';
 
-    // Marker entfernen
     if (marker) {
       map.removeLayer(marker);
       marker = null;
     }
 
-    // Plätze neu laden
     loadPlaces();
 
     alert('Platz erfolgreich aktualisiert');
@@ -367,7 +356,6 @@ async function deletePlace (placeId) {
       throw new Error('Fehler beim Löschen des Platzes');
     }
 
-    // Plätze neu laden
     loadPlaces();
 
     alert('Platz erfolgreich gelöscht');
@@ -409,12 +397,10 @@ async function startGame () {
       throw new Error('Fehler beim Erstellen des Spiels');
     }
 
-    // Formular zurücksetzen
     document.getElementById('team1').value = '';
     document.getElementById('team2').value = '';
     document.getElementById('platz').value = '';
 
-    // Spiele neu laden
     loadActiveGames();
   } catch (error) {
     console.error('Fehler beim Starten des Spiels:', error);
@@ -440,9 +426,8 @@ async function updateScore (gameId, team, points) {
     const gameData = await response.json();
     const currentScore = gameData.punkteVerlauf[gameData.punkteVerlauf.length - 1];
 
-    // Проверяем, достигла ли одна из команд 13 очков
+    // 13 Punkte - Ende
     if ((currentScore.mannschaft1Punkte >= 13 || currentScore.mannschaft2Punkte >= 13) && (currentScore.mannschaft1Punkte !== currentScore.mannschaft2Punkte)) {
-      // Автоматически завершаем игру
       await endGame(gameId, true);
     } else {
       loadActiveGames();
@@ -483,7 +468,6 @@ async function endGame (gameId, autoEnd = false) {
   }
 }
 
-// Funktion zum Löschen eines Spiels
 async function deleteGame (gameId) {
   if (!confirm('Möchten Sie das Spiel wirklich löschen?')) {
     return;
@@ -693,7 +677,7 @@ async function loadFinishedGames (page = 1) {
 
     gamesSection.appendChild(gamesContainer);
 
-    // Добавляем пагинацию
+    // Pagination
     const totalPages = Math.ceil(data.total / data.limit);
     if (totalPages > 1) {
       const pagination = document.createElement('div');
@@ -701,7 +685,7 @@ async function loadFinishedGames (page = 1) {
 
       let paginationHTML = '';
 
-      // Кнопка "Назад"
+      // "Zurück" Taste
       paginationHTML += `
                 <button class="page-button${page <= 1 ? ' disabled' : ''}" 
                         onclick="${page <= 1 ? '' : `loadFinishedGames(${page - 1})`}"
@@ -710,12 +694,12 @@ async function loadFinishedGames (page = 1) {
                 </button>
             `;
 
-      // Номера страниц
+      // Seitenzahl
       for (let i = 1; i <= totalPages; i++) {
         if (
-          i === 1 || // Первая страница
-                    i === totalPages || // Последняя страница
-                    (i >= page - 1 && i <= page + 1) // Текущая и соседние страницы
+          i === 1 ||
+                    i === totalPages ||
+                    (i >= page - 1 && i <= page + 1)
         ) {
           paginationHTML += `
                         <button class="page-button${i === page ? ' active' : ''}" 
@@ -724,14 +708,14 @@ async function loadFinishedGames (page = 1) {
                         </button>
                     `;
         } else if (
-          i === page - 2 || // Многоточие перед текущей страницей
-                    i === page + 2 // Многоточие после текущей страницы
+          i === page - 2 ||
+                    i === page + 2
         ) {
           paginationHTML += '<span class="page-ellipsis">...</span>';
         }
       }
 
-      // Кнопка "Вперед"
+      // "Vor" Taste
       paginationHTML += `
                 <button class="page-button${page >= totalPages ? ' disabled' : ''}" 
                         onclick="${page >= totalPages ? '' : `loadFinishedGames(${page + 1})`}"
@@ -757,13 +741,11 @@ async function loadFinishedGames (page = 1) {
   }
 }
 
-// Инициализация при загрузке страницы
 document.addEventListener('DOMContentLoaded', () => {
   loadActiveGames();
   loadFinishedGames();
 });
 
-// Globale Funktionen für die Verfügbarkeit in onclick Handlern
 window.startGame = startGame;
 window.updateScore = updateScore;
 window.endGame = endGame;
