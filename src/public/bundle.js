@@ -1,82 +1,9 @@
-(() => {
-  // src/public/script.js
-  var map;
-  var marker;
-  var defaultPosition = [51.1657, 10.4515];
-  document.addEventListener("DOMContentLoaded", function() {
-    initMap();
-    loadPlaces();
-    loadActiveGames();
-    loadFinishedGames();
-    const showAddPlaceFormButton = document.getElementById("showAddPlaceForm");
-    const addPlaceForm = document.getElementById("addPlaceForm");
-    if (showAddPlaceFormButton && addPlaceForm) {
-      showAddPlaceFormButton.addEventListener("click", () => {
-        addPlaceForm.classList.toggle("hidden");
-      });
-    }
-    const showNewGameFormButton = document.getElementById("showNewGameForm");
-    const gameForm = document.getElementById("gameForm");
-    if (showNewGameFormButton && gameForm) {
-      showNewGameFormButton.addEventListener("click", () => {
-        gameForm.classList.toggle("hidden");
-      });
-    }
-    const addPlaceButton = document.getElementById("addPlaceButton");
-    if (addPlaceButton) {
-      addPlaceButton.addEventListener("click", addPlace);
-    }
-  });
-  function initMap() {
-    if (!document.getElementById("map")) {
-      console.error("Map container not found");
-      return;
-    }
-    map = L.map("map").setView(defaultPosition, 6);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: " OpenStreetMap contributors"
-    }).addTo(map);
-    map.on("click", function(e) {
-      const addPlaceForm = document.getElementById("addPlaceForm");
-      if (!addPlaceForm.classList.contains("hidden")) {
-        const lat = e.latlng.lat;
-        const lng = e.latlng.lng;
-        document.getElementById("latitude").value = lat.toFixed(6);
-        document.getElementById("longitude").value = lng.toFixed(6);
-        if (marker) {
-          marker.setLatLng(e.latlng);
-        } else {
-          marker = L.marker(e.latlng).addTo(map);
-        }
-      }
-    });
-  }
-  async function loadPlaces() {
-    try {
-      const response = await fetch("/api/places");
-      const data = await response.json();
-      map.eachLayer((layer) => {
-        if (layer instanceof L.Marker) {
-          map.removeLayer(layer);
-        }
-      });
-      const platzSelect = document.getElementById("platz");
-      platzSelect.innerHTML = '<option value="">Bitte w\xE4hlen Sie einen Platz</option>';
-      data.places.forEach((place) => {
-        const option = document.createElement("option");
-        option.value = place._id;
-        option.textContent = place.name;
-        platzSelect.appendChild(option);
-        if (map && place.latitude && place.longitude) {
-          const marker2 = L.marker([place.latitude, place.longitude]);
-          const popupContent = document.createElement("div");
-          popupContent.className = "place-popup";
-          popupContent.innerHTML = `
-                    <h3>${place.name}</h3>
-                    <p><strong>Typ:</strong> ${place.type}</p>
-                    <p><strong>Zugang:</strong> ${place.access}</p>
-                    <p><strong>Felder:</strong> ${place.field_count}</p>
-                    ${place.notes ? `<p><strong>Notizen:</strong> ${place.notes}</p>` : ""}
+(()=>{var r,u,w=[51.1657,10.4515],f=L.divIcon({className:"custom-marker",html:'<div class="marker-pin"></div>',iconSize:[30,42],iconAnchor:[15,42]});document.addEventListener("DOMContentLoaded",function(){P(),h(),m(),p();let e=document.getElementById("showAddPlaceForm"),s=document.getElementById("addPlaceForm");e&&s&&e.addEventListener("click",()=>{s.classList.toggle("hidden")});let n=document.getElementById("showNewGameForm"),t=document.getElementById("gameForm");n&&t&&n.addEventListener("click",()=>{t.classList.toggle("hidden")});let i=document.getElementById("addPlaceButton");i&&i.addEventListener("click",F)});function P(){if(!document.getElementById("map")){console.error("Map container not found");return}r=L.map("map").setView(w,6),L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",{attribution:" OpenStreetMap contributors"}).addTo(r),r.on("click",function(e){if(!document.getElementById("addPlaceForm").classList.contains("hidden")){let n=e.latlng.lat,t=e.latlng.lng;document.getElementById("latitude").value=n.toFixed(6),document.getElementById("longitude").value=t.toFixed(6),u?u.setLatLng(e.latlng):u=L.marker(e.latlng,{icon:f}).addTo(r)}})}async function h(){try{let s=await(await fetch("/api/places")).json();r.eachLayer(t=>{t instanceof L.Marker&&r.removeLayer(t)});let n=document.getElementById("platz");n.innerHTML='<option value="">Bitte w\xE4hlen Sie einen Platz</option>',s.places.forEach(t=>{let i=document.createElement("option");if(i.value=t._id,i.textContent=t.name,n.appendChild(i),r&&t.latitude&&t.longitude){let a=L.marker([t.latitude,t.longitude],{icon:f}),l=document.createElement("div");l.className="place-popup",l.innerHTML=`
+                    <h3>${t.name}</h3>
+                    <p><strong>Typ:</strong> ${t.type}</p>
+                    <p><strong>Zugang:</strong> ${t.access}</p>
+                    <p><strong>Felder:</strong> ${t.fieldCount}</p>
+                    ${t.notes?`<p><strong>Notizen:</strong> ${t.notes}</p>`:""}
                     <div class="popup-actions">
                         <button class="edit-button">
                             <i class="fas fa-edit"></i> Bearbeiten
@@ -85,511 +12,123 @@
                             <i class="fas fa-trash"></i> L\xF6schen
                         </button>
                     </div>
-                `;
-          const editButton = popupContent.querySelector(".edit-button");
-          const deleteButton = popupContent.querySelector(".delete-button");
-          editButton.addEventListener("click", () => {
-            editPlace(place._id);
-          });
-          deleteButton.addEventListener("click", () => {
-            deletePlace(place._id);
-          });
-          marker2.bindPopup(popupContent);
-          marker2.addTo(map);
-        }
-      });
-    } catch (error) {
-      console.error("Fehler beim Laden der Pl\xE4tze:", error);
-    }
-  }
-  async function addPlace() {
-    const name = document.getElementById("name").value;
-    const latitude = parseFloat(document.getElementById("latitude").value);
-    const longitude = parseFloat(document.getElementById("longitude").value);
-    const access = document.getElementById("access").value;
-    const type = document.getElementById("type").value;
-    const field_count = parseInt(document.getElementById("field_count").value);
-    const notes = document.getElementById("notes").value;
-    if (!name || isNaN(latitude) || isNaN(longitude) || !access || !type || isNaN(field_count)) {
-      alert("Bitte f\xFCllen Sie alle Pflichtfelder aus");
-      return;
-    }
-    try {
-      const response = await fetch("/api/places", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name,
-          latitude,
-          longitude,
-          access,
-          type,
-          field_count,
-          notes
-        })
-      });
-      if (!response.ok) {
-        throw new Error("Fehler beim Hinzuf\xFCgen des Platzes");
-      }
-      document.getElementById("name").value = "";
-      document.getElementById("latitude").value = "";
-      document.getElementById("longitude").value = "";
-      document.getElementById("access").value = "\xD6ffentlich";
-      document.getElementById("type").value = "Outdoor";
-      document.getElementById("field_count").value = "1";
-      document.getElementById("notes").value = "";
-      if (marker) {
-        map.removeLayer(marker);
-        marker = null;
-      }
-      loadPlaces();
-      alert("Platz erfolgreich hinzugef\xFCgt");
-    } catch (error) {
-      console.error("Fehler:", error);
-      alert("Fehler beim Hinzuf\xFCgen des Platzes");
-    }
-  }
-  async function editPlace(placeId) {
-    try {
-      const response = await fetch(`/api/places/${placeId}`);
-      if (!response.ok) {
-        throw new Error("Fehler beim Laden des Platzes");
-      }
-      const place = await response.json();
-      document.getElementById("edit-name").value = place.name;
-      document.getElementById("edit-latitude").value = place.latitude;
-      document.getElementById("edit-longitude").value = place.longitude;
-      document.getElementById("edit-access").value = place.access;
-      document.getElementById("edit-type").value = place.type;
-      document.getElementById("edit-field_count").value = place.field_count;
-      document.getElementById("edit-notes").value = place.notes || "";
-      const editPlaceForm = document.getElementById("editPlaceForm");
-      editPlaceForm.classList.remove("hidden");
-      editPlaceForm.classList.add("edit-mode");
-      editPlaceForm.scrollIntoView({ behavior: "smooth" });
-      const updateButton = document.getElementById("updatePlaceButton");
-      const cancelButton = document.getElementById("cancelEditButton");
-      const newUpdateButton = updateButton.cloneNode(true);
-      const newCancelButton = cancelButton.cloneNode(true);
-      updateButton.parentNode.replaceChild(newUpdateButton, updateButton);
-      cancelButton.parentNode.replaceChild(newCancelButton, cancelButton);
-      newUpdateButton.addEventListener("click", async (e) => {
-        e.preventDefault();
-        await updatePlace(placeId);
-      });
-      newCancelButton.addEventListener("click", (e) => {
-        e.preventDefault();
-        cancelEdit();
-      });
-      if (marker) {
-        map.removeLayer(marker);
-      }
-      marker = L.marker([place.latitude, place.longitude]).addTo(map);
-      map.setView([place.latitude, place.longitude], 13);
-      map.closePopup();
-    } catch (error) {
-      console.error("Fehler beim Laden des Platzes:", error);
-      alert("Fehler beim Laden des Platzes");
-    }
-  }
-  function cancelEdit() {
-    const editPlaceForm = document.getElementById("editPlaceForm");
-    editPlaceForm.classList.add("hidden");
-    editPlaceForm.classList.remove("edit-mode");
-    document.getElementById("edit-name").value = "";
-    document.getElementById("edit-latitude").value = "";
-    document.getElementById("edit-longitude").value = "";
-    document.getElementById("edit-access").value = "\xD6ffentlich";
-    document.getElementById("edit-type").value = "Outdoor";
-    document.getElementById("edit-field_count").value = "1";
-    document.getElementById("edit-notes").value = "";
-    if (marker) {
-      map.removeLayer(marker);
-      marker = null;
-    }
-  }
-  async function updatePlace(placeId) {
-    const name = document.getElementById("edit-name").value;
-    const latitude = parseFloat(document.getElementById("edit-latitude").value);
-    const longitude = parseFloat(document.getElementById("edit-longitude").value);
-    const access = document.getElementById("edit-access").value;
-    const type = document.getElementById("edit-type").value;
-    const field_count = parseInt(document.getElementById("edit-field_count").value);
-    const notes = document.getElementById("edit-notes").value;
-    if (!name || isNaN(latitude) || isNaN(longitude) || !access || !type || isNaN(field_count)) {
-      alert("Bitte f\xFCllen Sie alle Pflichtfelder aus");
-      return;
-    }
-    try {
-      const response = await fetch(`/api/places/${placeId}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          name,
-          latitude,
-          longitude,
-          access,
-          type,
-          field_count,
-          notes
-        })
-      });
-      if (!response.ok) {
-        throw new Error("Fehler beim Aktualisieren des Platzes");
-      }
-      const editPlaceForm = document.getElementById("editPlaceForm");
-      editPlaceForm.classList.add("hidden");
-      editPlaceForm.classList.remove("edit-mode");
-      document.getElementById("edit-name").value = "";
-      document.getElementById("edit-latitude").value = "";
-      document.getElementById("edit-longitude").value = "";
-      document.getElementById("edit-access").value = "\xD6ffentlich";
-      document.getElementById("edit-type").value = "Outdoor";
-      document.getElementById("edit-field_count").value = "1";
-      document.getElementById("edit-notes").value = "";
-      if (marker) {
-        map.removeLayer(marker);
-        marker = null;
-      }
-      loadPlaces();
-      alert("Platz erfolgreich aktualisiert");
-    } catch (error) {
-      console.error("Fehler:", error);
-      alert("Fehler beim Aktualisieren des Platzes");
-    }
-  }
-  async function deletePlace(placeId) {
-    if (!confirm("M\xF6chten Sie diesen Platz wirklich l\xF6schen?")) {
-      return;
-    }
-    try {
-      const response = await fetch(`/api/places/${placeId}`, {
-        method: "DELETE"
-      });
-      if (!response.ok) {
-        throw new Error("Fehler beim L\xF6schen des Platzes");
-      }
-      loadPlaces();
-      alert("Platz erfolgreich gel\xF6scht");
-    } catch (error) {
-      console.error("Fehler:", error);
-      alert("Fehler beim L\xF6schen des Platzes");
-    }
-  }
-  async function startGame() {
-    const team1 = document.getElementById("team1").value.trim();
-    const team2 = document.getElementById("team2").value.trim();
-    const platzId = document.getElementById("platz").value;
-    if (!team1 || !team2) {
-      alert("Bitte geben Sie beide Teamnamen ein");
-      return;
-    }
-    if (!platzId) {
-      alert("Bitte w\xE4hlen Sie einen Platz aus");
-      return;
-    }
-    try {
-      const response = await fetch("/api/games", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          teams: [team1, team2],
-          platz: platzId
-        })
-      });
-      if (!response.ok) {
-        throw new Error("Fehler beim Erstellen des Spiels");
-      }
-      document.getElementById("team1").value = "";
-      document.getElementById("team2").value = "";
-      document.getElementById("platz").value = "";
-      loadActiveGames();
-    } catch (error) {
-      console.error("Fehler beim Starten des Spiels:", error);
-      alert("Fehler beim Starten des Spiels");
-    }
-  }
-  async function updateScore(gameId, team, points) {
-    try {
-      const response = await fetch(`/api/games/${gameId}/score`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ team, change: points })
-      });
-      if (!response.ok) {
-        throw new Error("Fehler beim Aktualisieren des Spielstands");
-      }
-      loadActiveGames();
-    } catch (error) {
-      console.error("Fehler:", error);
-      alert("Fehler beim Aktualisieren des Spielstands");
-    }
-  }
-  async function endGame(gameId) {
-    if (!confirm("M\xF6chten Sie das Spiel wirklich beenden?")) {
-      return;
-    }
-    try {
-      const response = await fetch(`/api/games/${gameId}/end`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
-      if (!response.ok) {
-        throw new Error("Fehler beim Beenden des Spiels");
-      }
-      loadActiveGames();
-      loadFinishedGames();
-    } catch (error) {
-      console.error("Fehler:", error);
-      alert("Fehler beim Beenden des Spiels");
-    }
-  }
-  async function deleteGame(gameId) {
-    if (!confirm("M\xF6chten Sie das Spiel wirklich l\xF6schen?")) {
-      return;
-    }
-    try {
-      const response = await fetch(`/api/games/${gameId}`, {
-        method: "DELETE"
-      });
-      if (!response.ok) {
-        throw new Error("Fehler beim L\xF6schen des Spiels");
-      }
-      loadActiveGames();
-      loadFinishedGames();
-    } catch (error) {
-      console.error("Fehler:", error);
-      alert("Fehler beim L\xF6schen des Spiels");
-    }
-  }
-  async function loadActiveGames() {
-    try {
-      const response = await fetch("/api/games?status=laufend");
-      const data = await response.json();
-      const activeGamesContainer = document.getElementById("activeGames");
-      activeGamesContainer.innerHTML = "";
-      if (!data.spiele || data.spiele.length === 0) {
-        activeGamesContainer.innerHTML = `
+                `;let o=l.querySelector(".edit-button"),c=l.querySelector(".delete-button");o.addEventListener("click",()=>{y(t._id)}),c.addEventListener("click",()=>{g(t._id)}),a.bindPopup(l),a.addTo(r)}})}catch(e){console.error("Fehler beim Laden der Pl\xE4tze:",e)}}async function F(){let e=document.getElementById("name").value,s=parseFloat(document.getElementById("latitude").value),n=parseFloat(document.getElementById("longitude").value),t=document.getElementById("access").value,i=document.getElementById("type").value,a=parseInt(document.getElementById("field_count").value),l=document.getElementById("notes").value;if(!e||isNaN(s)||isNaN(n)||!t||!i||isNaN(a)){alert("Bitte f\xFCllen Sie alle Pflichtfelder aus");return}try{if(!(await fetch("/api/places",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:e,latitude:s,longitude:n,access:t,type:i,fieldCount:a,notes:l})})).ok)throw new Error("Fehler beim Hinzuf\xFCgen des Platzes");document.getElementById("name").value="",document.getElementById("latitude").value="",document.getElementById("longitude").value="",document.getElementById("access").value="\xD6ffentlich",document.getElementById("type").value="Outdoor",document.getElementById("field_count").value="1",document.getElementById("notes").value="",u&&(r.removeLayer(u),u=null),h(),alert("Platz erfolgreich hinzugef\xFCgt")}catch(o){console.error("Fehler:",o),alert("Fehler beim Hinzuf\xFCgen des Platzes")}}async function y(e){try{let s=await fetch(`/api/places/${e}`);if(!s.ok)throw new Error("Fehler beim Laden des Platzes");let n=await s.json();document.getElementById("edit-name").value=n.name,document.getElementById("edit-latitude").value=n.latitude,document.getElementById("edit-longitude").value=n.longitude,document.getElementById("edit-access").value=n.access,document.getElementById("edit-type").value=n.type,document.getElementById("edit-field_count").value=n.fieldCount,document.getElementById("edit-notes").value=n.notes||"";let t=document.getElementById("editPlaceForm");t.classList.remove("hidden"),t.classList.add("edit-mode"),t.scrollIntoView({behavior:"smooth"});let i=document.getElementById("updatePlaceButton"),a=document.getElementById("cancelEditButton"),l=i.cloneNode(!0),o=a.cloneNode(!0);i.parentNode.replaceChild(l,i),a.parentNode.replaceChild(o,a),l.addEventListener("click",async c=>{c.preventDefault(),await $(e)}),o.addEventListener("click",c=>{c.preventDefault(),S()}),u&&r.removeLayer(u),u=L.marker([n.latitude,n.longitude],{icon:f}).addTo(r),r.setView([n.latitude,n.longitude],13),r.closePopup()}catch(s){console.error("Fehler beim Laden des Platzes:",s),alert("Fehler beim Laden des Platzes")}}function S(){let e=document.getElementById("editPlaceForm");e.classList.add("hidden"),e.classList.remove("edit-mode"),document.getElementById("edit-name").value="",document.getElementById("edit-latitude").value="",document.getElementById("edit-longitude").value="",document.getElementById("edit-access").value="\xD6ffentlich",document.getElementById("edit-type").value="Outdoor",document.getElementById("edit-field_count").value="1",document.getElementById("edit-notes").value="",u&&(r.removeLayer(u),u=null)}async function $(e){let s=document.getElementById("edit-name").value,n=parseFloat(document.getElementById("edit-latitude").value),t=parseFloat(document.getElementById("edit-longitude").value),i=document.getElementById("edit-access").value,a=document.getElementById("edit-type").value,l=parseInt(document.getElementById("edit-field_count").value),o=document.getElementById("edit-notes").value;if(!s||isNaN(n)||isNaN(t)||!i||!a||isNaN(l)){alert("Bitte f\xFCllen Sie alle Pflichtfelder aus");return}try{if(!(await fetch(`/api/places/${e}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:s,latitude:n,longitude:t,access:i,type:a,fieldCount:l,notes:o})})).ok)throw new Error("Fehler beim Aktualisieren des Platzes");let d=document.getElementById("editPlaceForm");d.classList.add("hidden"),d.classList.remove("edit-mode"),document.getElementById("edit-name").value="",document.getElementById("edit-latitude").value="",document.getElementById("edit-longitude").value="",document.getElementById("edit-access").value="\xD6ffentlich",document.getElementById("edit-type").value="Outdoor",document.getElementById("edit-field_count").value="1",document.getElementById("edit-notes").value="",u&&(r.removeLayer(u),u=null),h(),alert("Platz erfolgreich aktualisiert")}catch(c){console.error("Fehler:",c),alert("Fehler beim Aktualisieren des Platzes")}}async function g(e){if(confirm("M\xF6chten Sie diesen Platz wirklich l\xF6schen?"))try{if(!(await fetch(`/api/places/${e}`,{method:"DELETE"})).ok)throw new Error("Fehler beim L\xF6schen des Platzes");h(),alert("Platz erfolgreich gel\xF6scht")}catch(s){console.error("Fehler:",s),alert("Fehler beim L\xF6schen des Platzes")}}async function z(){let e=document.getElementById("team1").value.trim(),s=document.getElementById("team2").value.trim(),n=document.getElementById("platz").value;if(!e||!s){alert("Bitte geben Sie beide Teamnamen ein");return}if(!n){alert("Bitte w\xE4hlen Sie einen Platz aus");return}try{if(!(await fetch("/api/games",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({teams:[e,s],platz:n})})).ok)throw new Error("Fehler beim Erstellen des Spiels");document.getElementById("team1").value="",document.getElementById("team2").value="",document.getElementById("platz").value="",m()}catch(t){console.error("Fehler beim Starten des Spiels:",t),alert("Fehler beim Starten des Spiels")}}async function C(e,s,n){try{let t=await fetch(`/api/games/${e}/score`,{method:"PATCH",headers:{"Content-Type":"application/json"},body:JSON.stringify({team:s,change:n})});if(!t.ok)throw new Error("Fehler beim Aktualisieren des Spielstands");let i=await t.json(),a=i.punkteVerlauf[i.punkteVerlauf.length-1];(a.mannschaft1Punkte>=13||a.mannschaft2Punkte>=13)&&a.mannschaft1Punkte!==a.mannschaft2Punkte?await E(e,!0):m()}catch(t){console.error("Fehler:",t),alert("Fehler beim Aktualisieren des Spielstands")}}async function E(e,s=!1){if(!(!s&&!confirm("M\xF6chten Sie das Spiel wirklich beenden?")))try{if(!(await fetch(`/api/games/${e}/end`,{method:"PATCH",headers:{"Content-Type":"application/json"}})).ok)throw new Error("Fehler beim Beenden des Spiels");m(),p(),s&&alert("Spiel automatisch beendet - 13 Punkte erreicht!")}catch(n){console.error("Fehler:",n),alert("Fehler beim Beenden des Spiels")}}async function N(e){if(confirm("M\xF6chten Sie das Spiel wirklich l\xF6schen?"))try{if(!(await fetch(`/api/games/${e}`,{method:"DELETE"})).ok)throw new Error("Fehler beim L\xF6schen des Spiels");m(),p()}catch(s){console.error("Fehler:",s),alert("Fehler beim L\xF6schen des Spiels")}}async function m(){try{let s=await(await fetch("/api/games?status=laufend")).json(),n=document.getElementById("activeGames");if(n.innerHTML="",!s.spiele||s.spiele.length===0){n.innerHTML=`
                 <div class="empty-state">
                     <i class="fas fa-dice"></i>
                     <p>Keine aktiven Spiele</p>
                 </div>
-            `;
-        return;
-      }
-      const gamesSection = document.createElement("div");
-      gamesSection.className = "games-section";
-      gamesSection.innerHTML = `
+            `;return}let t=document.createElement("div");t.className="games-section",t.innerHTML=`
             <h2><i class="fas fa-play-circle"></i> Aktive Spiele</h2>
-        `;
-      const gamesContainer = document.createElement("div");
-      gamesContainer.className = "games-container";
-      data.spiele.forEach((game) => {
-        const gameElement = document.createElement("div");
-        gameElement.className = "game-item active";
-        const currentScore = game.punkteVerlauf[game.punkteVerlauf.length - 1];
-        gameElement.innerHTML = `
+        `;let i=document.createElement("div");i.className="games-container",s.spiele.forEach(a=>{let l=document.createElement("div");l.className="game-item active";let o=a.punkteVerlauf[a.punkteVerlauf.length-1];l.innerHTML=`
                 <div class="game-header">
                     <div class="game-title">
-                        <div class="teams">${game.teams[0]} vs. ${game.teams[1]}</div>
-                        <div class="score">${currentScore.mannschaft1Punkte}:${currentScore.mannschaft2Punkte}</div>
+                        <div class="teams">${a.teams[0]} vs. ${a.teams[1]}</div>
+                        <div class="score">${o.mannschaft1Punkte}:${o.mannschaft2Punkte}</div>
                     </div>
                 </div>
-                ${game.platz ? `
+                ${a.platz?`
                     <div class="game-location">
                         <i class="fas fa-map-marker-alt"></i>
-                        ${game.platz.name}
+                        ${a.platz.name}
                     </div>
-                ` : ""}
+                `:""}
                 <div class="score-controls">
                     <div class="team-score">
-                        <div class="team-name">${game.teams[0]}</div>
+                        <div class="team-name">${a.teams[0]}</div>
                         <div class="score-buttons">
-                            <button onclick="updateScore('${game._id}', 1, 1)" class="score-btn plus">+1</button>
-                            <button onclick="updateScore('${game._id}', 1, 2)" class="score-btn plus">+2</button>
-                            <button onclick="updateScore('${game._id}', 1, 3)" class="score-btn plus">+3</button>
-                            <button onclick="updateScore('${game._id}', 1, -1)" class="score-btn minus">-1</button>
+                            <button onclick="updateScore('${a._id}', 1, 1)" class="score-btn plus">+1</button>
+                            <button onclick="updateScore('${a._id}', 1, 2)" class="score-btn plus">+2</button>
+                            <button onclick="updateScore('${a._id}', 1, 3)" class="score-btn plus">+3</button>
+                            <button onclick="updateScore('${a._id}', 1, -1)" class="score-btn minus">-1</button>
                         </div>
                     </div>
                     <div class="team-score">
-                        <div class="team-name">${game.teams[1]}</div>
+                        <div class="team-name">${a.teams[1]}</div>
                         <div class="score-buttons">
-                            <button onclick="updateScore('${game._id}', 2, 1)" class="score-btn plus">+1</button>
-                            <button onclick="updateScore('${game._id}', 2, 2)" class="score-btn plus">+2</button>
-                            <button onclick="updateScore('${game._id}', 2, 3)" class="score-btn plus">+3</button>
-                            <button onclick="updateScore('${game._id}', 2, -1)" class="score-btn minus">-1</button>
+                            <button onclick="updateScore('${a._id}', 2, 1)" class="score-btn plus">+1</button>
+                            <button onclick="updateScore('${a._id}', 2, 2)" class="score-btn plus">+2</button>
+                            <button onclick="updateScore('${a._id}', 2, 3)" class="score-btn plus">+3</button>
+                            <button onclick="updateScore('${a._id}', 2, -1)" class="score-btn minus">-1</button>
                         </div>
                     </div>
                 </div>
                 <div class="game-actions">
-                    <button onclick="endGame('${game._id}')" class="control-button finish">
+                    <button onclick="endGame('${a._id}')" class="control-button finish">
                         <i class="fas fa-flag-checkered"></i>
                         Spiel beenden
                     </button>
-                    <button onclick="deleteGame('${game._id}')" class="control-button delete">
+                    <button onclick="deleteGame('${a._id}')" class="control-button delete">
                         <i class="fas fa-trash"></i>
                         L\xF6schen
                     </button>
                 </div>
-            `;
-        gamesContainer.appendChild(gameElement);
-      });
-      gamesSection.appendChild(gamesContainer);
-      activeGamesContainer.appendChild(gamesSection);
-    } catch (error) {
-      console.error("Fehler beim Laden der aktiven Spiele:", error);
-      const activeGamesContainer = document.getElementById("activeGames");
-      activeGamesContainer.innerHTML = `
+            `,i.appendChild(l)}),t.appendChild(i),n.appendChild(t)}catch(e){console.error("Fehler beim Laden der aktiven Spiele:",e);let s=document.getElementById("activeGames");s.innerHTML=`
             <div class="error-state">
                 <i class="fas fa-exclamation-circle"></i>
                 <p>Fehler beim Laden der Spiele</p>
             </div>
-        `;
-    }
-  }
-  async function loadFinishedGames(page = 1) {
-    try {
-      const response = await fetch(`/api/games?status=beendet&page=${page}&limit=6`);
-      const data = await response.json();
-      const finishedGamesContainer = document.getElementById("finishedGames");
-      finishedGamesContainer.innerHTML = "";
-      if (!data.spiele || data.spiele.length === 0) {
-        finishedGamesContainer.innerHTML = `
+        `}}async function p(e=1){try{let n=await(await fetch(`/api/games?status=beendet&page=${e}&limit=6`)).json(),t=document.getElementById("finishedGames");if(t.innerHTML="",!n.spiele||n.spiele.length===0){t.innerHTML=`
                 <div class="empty-state">
                     <i class="fas fa-trophy"></i>
                     <p>Keine beendeten Spiele</p>
                 </div>
-            `;
-        return;
-      }
-      const gamesSection = document.createElement("div");
-      gamesSection.className = "games-section";
-      gamesSection.innerHTML = `
+            `;return}let i=document.createElement("div");i.className="games-section",i.innerHTML=`
             <h2><i class="fas fa-flag-checkered"></i> Beendete Spiele</h2>
-        `;
-      const gamesContainer = document.createElement("div");
-      gamesContainer.className = "games-container";
-      data.spiele.forEach((game) => {
-        const gameElement = document.createElement("div");
-        gameElement.className = "game-item finished";
-        const finalScore = game.punkteVerlauf[game.punkteVerlauf.length - 1];
-        const winner = finalScore.mannschaft1Punkte > finalScore.mannschaft2Punkte ? game.teams[0] : game.teams[1];
-        const endDate = new Date(game.endZeit);
-        const formattedDate = endDate.toLocaleString("de-DE", {
-          day: "2-digit",
-          month: "2-digit",
-          year: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        });
-        const punkteVerlauf = game.punkteVerlauf.map((score, index) => `
+        `;let a=document.createElement("div");a.className="games-container",n.spiele.forEach(o=>{let c=document.createElement("div");c.className="game-item finished";let d=o.punkteVerlauf[o.punkteVerlauf.length-1],b=d.mannschaft1Punkte>d.mannschaft2Punkte?o.teams[0]:o.teams[1],B=new Date(o.endZeit).toLocaleString("de-DE",{day:"2-digit",month:"2-digit",year:"numeric",hour:"2-digit",minute:"2-digit"}),k=o.punkteVerlauf.map((v,I)=>`
                 <div class="round">
-                    <div class="round-number">Runde ${index + 1}</div>
-                    <div class="round-score">${score.mannschaft1Punkte}:${score.mannschaft2Punkte}</div>
+                    <div class="round-number">Runde ${I+1}</div>
+                    <div class="round-score">${v.mannschaft1Punkte}:${v.mannschaft2Punkte}</div>
                 </div>
-            `).join("");
-        gameElement.innerHTML = `
+            `).join("");c.innerHTML=`
                 <div class="game-header">
                     <div class="game-title">
-                        <div class="teams">${game.teams[0]} vs. ${game.teams[1]}</div>
-                        <div class="final-score">${finalScore.mannschaft1Punkte}:${finalScore.mannschaft2Punkte}</div>
+                        <div class="teams">${o.teams[0]} vs. ${o.teams[1]}</div>
+                        <div class="final-score">${d.mannschaft1Punkte}:${d.mannschaft2Punkte}</div>
                     </div>
                     <div class="winner-badge">
                         <i class="fas fa-trophy"></i>
-                        ${winner}
+                        ${b}
                     </div>
                 </div>
-                ${game.platz ? `
+                ${o.platz?`
                     <div class="game-location">
                         <i class="fas fa-map-marker-alt"></i>
-                        ${game.platz.name}
+                        ${o.platz.name}
                     </div>
-                ` : ""}
+                `:""}
                 <div class="game-info">
                     <div class="end-time">
                         <i class="far fa-clock"></i>
-                        Beendet am ${formattedDate}
+                        Beendet am ${B}
                     </div>
                     <div class="rounds-history">
-                        ${punkteVerlauf}
+                        ${k}
                     </div>
                 </div>
-                <button onclick="deleteGame('${game._id}')" class="control-button delete">
+                <button onclick="deleteGame('${o._id}')" class="control-button delete">
                     <i class="fas fa-trash"></i>
                     L\xF6schen
                 </button>
-            `;
-        gamesContainer.appendChild(gameElement);
-      });
-      gamesSection.appendChild(gamesContainer);
-      const totalPages = Math.ceil(data.total / data.limit);
-      if (totalPages > 1) {
-        const pagination = document.createElement("div");
-        pagination.className = "pagination";
-        let paginationHTML = "";
-        paginationHTML += `
-                <button class="page-button${page <= 1 ? " disabled" : ""}" 
-                        onclick="${page <= 1 ? "" : `loadFinishedGames(${page - 1})`}"
-                        ${page <= 1 ? "disabled" : ""}>
+            `,a.appendChild(c)}),i.appendChild(a);let l=Math.ceil(n.total/n.limit);if(l>1){let o=document.createElement("div");o.className="pagination";let c="";c+=`
+                <button class="page-button${e<=1?" disabled":""}" 
+                        onclick="${e<=1?"":`loadFinishedGames(${e-1})`}"
+                        ${e<=1?"disabled":""}>
                     <i class="fas fa-chevron-left"></i>
                 </button>
-            `;
-        for (let i = 1; i <= totalPages; i++) {
-          if (i === 1 || // Первая страница
-          i === totalPages || // Последняя страница
-          i >= page - 1 && i <= page + 1) {
-            paginationHTML += `
-                        <button class="page-button${i === page ? " active" : ""}" 
-                                onclick="loadFinishedGames(${i})">
-                            ${i}
+            `;for(let d=1;d<=l;d++)d===1||d===l||d>=e-1&&d<=e+1?c+=`
+                        <button class="page-button${d===e?" active":""}" 
+                                onclick="loadFinishedGames(${d})">
+                            ${d}
                         </button>
-                    `;
-          } else if (i === page - 2 || // Многоточие перед текущей страницей
-          i === page + 2) {
-            paginationHTML += `<span class="page-ellipsis">...</span>`;
-          }
-        }
-        paginationHTML += `
-                <button class="page-button${page >= totalPages ? " disabled" : ""}" 
-                        onclick="${page >= totalPages ? "" : `loadFinishedGames(${page + 1})`}"
-                        ${page >= totalPages ? "disabled" : ""}>
+                    `:(d===e-2||d===e+2)&&(c+='<span class="page-ellipsis">...</span>');c+=`
+                <button class="page-button${e>=l?" disabled":""}" 
+                        onclick="${e>=l?"":`loadFinishedGames(${e+1})`}"
+                        ${e>=l?"disabled":""}>
                     <i class="fas fa-chevron-right"></i>
                 </button>
-            `;
-        pagination.innerHTML = paginationHTML;
-        gamesSection.appendChild(pagination);
-      }
-      finishedGamesContainer.appendChild(gamesSection);
-    } catch (error) {
-      console.error("Fehler beim Laden der beendeten Spiele:", error);
-      const finishedGamesContainer = document.getElementById("finishedGames");
-      finishedGamesContainer.innerHTML = `
+            `,o.innerHTML=c,i.appendChild(o)}t.appendChild(i)}catch(s){console.error("Fehler beim Laden der beendeten Spiele:",s);let n=document.getElementById("finishedGames");n.innerHTML=`
             <div class="error-state">
                 <i class="fas fa-exclamation-circle"></i>
                 <p>Fehler beim Laden der Spiele</p>
             </div>
-        `;
-    }
-  }
-  document.addEventListener("DOMContentLoaded", () => {
-    loadActiveGames();
-    loadFinishedGames();
-  });
-  window.startGame = startGame;
-  window.updateScore = updateScore;
-  window.endGame = endGame;
-  window.deleteGame = deleteGame;
-  window.loadFinishedGames = loadFinishedGames;
-  window.editPlace = editPlace;
-  window.deletePlace = deletePlace;
-})();
+        `}}document.addEventListener("DOMContentLoaded",()=>{m(),p()});window.startGame=z;window.updateScore=C;window.endGame=E;window.deleteGame=N;window.loadFinishedGames=p;window.editPlace=y;window.deletePlace=g;})();

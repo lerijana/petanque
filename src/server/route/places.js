@@ -15,26 +15,26 @@ router.get('/', async (req, res) => {
 
 // GET /places/:id - Einzelnen Platz abrufen
 router.get('/:id', async (req, res) => {
-    const { id } = req.params;
-    
-    try {
-        const place = await Place.findById(id);
-        
-        if (!place) {
-            return res.status(404).json({ error: 'Platz nicht gefunden' });
-        }
-        
-        res.json(place);
-    } catch (err) {
-        console.error('Fehler beim Abrufen des Platzes:', err.message);
-        res.status(500).json({ error: err.message });
+  const { id } = req.params;
+
+  try {
+    const place = await Place.findById(id);
+
+    if (!place) {
+      return res.status(404).json({ error: 'Platz nicht gefunden' });
     }
+
+    res.json(place);
+  } catch (err) {
+    console.error('Fehler beim Abrufen des Platzes:', err.message);
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // POST /places - Neuen Platz hinzufügen
 router.post('/', async (req, res) => {
   console.log('Empfangener Body:', req.body); // Debugging: Eingehender Body
-  const { name, access, type, field_count, latitude, longitude, notes } = req.body;
+  const { name, access, type, fieldCount, latitude, longitude, notes } = req.body;
 
   try {
     // Validierung: Sicherstellen, dass die wichtigsten Felder vorhanden sind
@@ -46,10 +46,10 @@ router.post('/', async (req, res) => {
       name,
       access,
       type,
-      field_count,
+      fieldCount,
       latitude,
       longitude,
-      notes,
+      notes
     });
 
     res.status(201).json(newPlace); // Erfolgreiche Antwort mit den gespeicherten Daten
@@ -59,16 +59,15 @@ router.post('/', async (req, res) => {
   }
 });
 
-
 // PUT /places/:id - Bestehenden Platz aktualisieren
 router.put('/:id', async (req, res) => {
   const { id } = req.params; // ID aus der URL
-  const { name, access, type, field_count, latitude, longitude, notes } = req.body; // Daten aus dem Body
+  const { name, access, type, fieldCount, latitude, longitude, notes } = req.body; // Daten aus dem Body
 
   try {
     const updatedPlace = await Place.findByIdAndUpdate(
       id, // Die ID des Platzes
-      { name, access, type, field_count, latitude, longitude, notes }, // Neue Daten
+      { name, access, type, fieldCount, latitude, longitude, notes }, // Neue Daten
       { new: true } // Gibt die aktualisierten Daten zurück
     );
 

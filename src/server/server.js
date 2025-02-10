@@ -1,7 +1,7 @@
 // Importiere das Express-Paket und die Routen
 const express = require('express');
 const mongoose = require('mongoose');
-const cors = require('cors'); 
+const cors = require('cors');
 const placesRouter = require('./route/places');
 const gamesRouter = require('./route/games');
 const path = require('path');
@@ -15,12 +15,12 @@ const PORT = process.argv[2] || 8080;
 // Verbinde mit MongoDB
 mongoose.connect('mongodb://localhost:27017/petanque', {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 })
   .then(() => console.log('Mit MongoDB verbunden'))
   .catch(err => console.error('Fehler beim Verbinden mit MongoDB:', err.message));
 
-app.use(cors());  
+app.use(cors());
 
 // Middleware zum Parsen von JSON-Anfragen
 app.use(express.json());
@@ -36,5 +36,3 @@ app.use('/api/games', gamesRouter);
 app.listen(PORT, () => {
   console.log(`Server läuft auf http://localhost:${PORT}`);
 });
-
-

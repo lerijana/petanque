@@ -5,7 +5,8 @@
   "main": "src/server/server.js",
   "scripts": {
     "clean": "rm -rf src/public/bundle.js src/public/style.css node_modules",
-    "lint": "semistandard --ignore 'src/public/bundle.js' 'src/**/*.js'",
+    "lint": "semistandard 'src/server/**/*.js' 'src/public/script.js'",
+    "lint:fix": "semistandard --fix 'src/server/**/*.js' 'src/public/script.js'",
     "debug": "npm run lint && npm run build:css && npm run build:js && echo 'Debug build erfolgreich.'",
     "build": "npm run lint && npm run build:css:min && npm run build:js:min && echo 'Build erfolgreich.'",
     "build:css": "lessc src/public/style.less src/public/style.css",

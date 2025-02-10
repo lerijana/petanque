@@ -16,29 +16,29 @@ const placeSchema = new mongoose.Schema({
 });
 
 const spielSchema = new mongoose.Schema({
-    teams: [String],
-    punkteVerlauf: [{
-        runde: Number,
-        mannschaft1Punkte: Number,
-        mannschaft2Punkte: Number
-    }],
-    startZeit: {
-        type: Date,
-        default: Date.now
-    },
-    endZeit: Date,
-    status: {
-        type: String,
-        enum: ['laufend', 'beendet'],
-        default: 'laufend'
-    },
-    platz: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Place',
-        required: false
-    }
+  teams: [String],
+  punkteVerlauf: [{
+    runde: Number,
+    mannschaft1Punkte: Number,
+    mannschaft2Punkte: Number
+  }],
+  startZeit: {
+    type: Date,
+    default: Date.now
+  },
+  endZeit: Date,
+  status: {
+    type: String,
+    enum: ['laufend', 'beendet'],
+    default: 'laufend'
+  },
+  platz: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Place',
+    required: false
+  }
 }, {
-    timestamps: true
+  timestamps: true
 });
 
 const Place = mongoose.model('Place', placeSchema);
